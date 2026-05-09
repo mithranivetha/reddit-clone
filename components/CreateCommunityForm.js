@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 
 export default function CreateCommunityForm() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -31,7 +31,13 @@ export default function CreateCommunityForm() {
       const res = await fetch("/api/communities", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description }),
+        body: JSON.stringify({ 
+          name, 
+          description,
+          clerkId: user.id,
+          email: user.primaryEmailAddress.emailAddress,
+          username: user.username || user.primaryEmailAddress.emailAddress.split("@")[0],
+        }),
       });
 
       const data = await res.json();

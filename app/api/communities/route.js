@@ -1,25 +1,20 @@
 import { prisma } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
-    const { userId } = await auth();
-    
-    if (!userId) {
+    const { name, description, clerkId, email, username } = await req.json();
+
+    if (!clerkId) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
-
-    const { name, description } = await req.json();
 
     if (!name) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
-    // Clean the name - lowercase, no spaces
     const cleanName = name.toLowerCase().replace(/\s+/g, "-");
 
-    // Check if community already exists
     const existing = await prisma.community.findUnique({
       where: { slug: cleanName },
     });
@@ -28,13 +23,19 @@ export async function POST(req) {
       return NextResponse.json({ error: "Community already exists" }, { status: 400 });
     }
 
-    // Make sure user exists in our database
+    // Get or create user in database
     let user = await prisma.user.findUnique({
-      where: { clerkId: userId },
+      where: { clerkId },
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found. Please complete signup." }, { status: 404 });
+      user = await prisma.user.create({
+        data: {
+          clerkId,
+          email,
+          username,
+        },
+      });
     }
 
     const community = await prisma.community.create({

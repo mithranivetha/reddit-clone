@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { Playfair_Display, Lato } from "next/font/google";
 import Navbar from "@/components/Navbar";
+import UserSync from "@/components/UserSync";
 import "./globals.css";
 
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <body className={`${playfair.variable} ${lato.variable} font-lato`}>
           <Navbar />
+          <UserSync />
           <main className="pt-16">
             {children}
           </main>
