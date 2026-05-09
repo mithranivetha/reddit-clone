@@ -20,7 +20,7 @@ export default async function CreatePostPage({ params }) {
           Create a Post
         </h1>
         <p className="mb-8" style={{color: "#7A6263"}}>
-          Posting in <span className="font-bold" style={{color: "#087E8B"}}>r/{community.name}</span>
+          Posting in <span className="font-bold" style={{color: "#087E8B"}}>n/{community.name}</span>
         </p>
         <CreatePostForm communityId={community.id} slug={slug} />
       </div>

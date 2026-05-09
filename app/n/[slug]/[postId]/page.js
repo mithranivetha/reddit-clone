@@ -1,9 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import VoteButtons from "@/components/VoteButtons";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function PostPage({ params }) {
   const { slug, postId } = await params;
+  const { userId } = auth();
+
+  // Get current user's database ID
+  let currentUserDbId = null;
+  if (userId) {
+    const currentUser = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
+    currentUserDbId = currentUser?.id || null;
+  }
 
   const post = await prisma.post.findUnique({
     where: { id: postId },
@@ -22,16 +34,17 @@ export default async function PostPage({ params }) {
     notFound();
   }
 
-  const voteCount = post.votes.filter((v) => v.type === "UP").length -
-    post.votes.filter((v) => v.type === "DOWN").length;
-
   return (
     <div className="min-h-screen py-8 px-4" style={{backgroundColor: "#E0E1DD"}}>
       <div className="max-w-4xl mx-auto">
 
         {/* Back link */}
-        <Link href={`/r/${slug}`} className="flex items-center gap-2 mb-6 font-medium hover:opacity-70 transition-opacity" style={{color: "#087E8B"}}>
-          ← Back to r/{slug}
+        <Link
+          href={`/n/${slug}`}
+          className="flex items-center gap-2 mb-6 font-medium hover:opacity-70 transition-opacity"
+          style={{color: "#087E8B"}}
+        >
+          ← Back to n/{slug}
         </Link>
 
         {/* Post Card */}
@@ -39,8 +52,12 @@ export default async function PostPage({ params }) {
           
           {/* Community + Author */}
           <div className="flex items-center gap-2 mb-4 text-sm" style={{color: "#7A6263"}}>
-            <Link href={`/r/${slug}`} className="font-bold hover:opacity-70" style={{color: "#087E8B"}}>
-              r/{post.community.name}
+            <Link
+              href={`/n/${slug}`}
+              className="font-bold hover:opacity-70"
+              style={{color: "#087E8B"}}
+            >
+              n/{post.community.name}
             </Link>
             <span>•</span>
             <span>Posted by {post.author.username}</span>
@@ -49,7 +66,10 @@ export default async function PostPage({ params }) {
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl font-bold mb-4" style={{color: "#0B3954", fontFamily: "var(--font-playfair)"}}>
+          <h1
+            className="text-3xl font-bold mb-4"
+            style={{color: "#0B3954", fontFamily: "var(--font-playfair)"}}
+          >
             {post.title}
           </h1>
 
@@ -73,22 +93,34 @@ export default async function PostPage({ params }) {
             {post.content}
           </p>
 
-          {/* Vote count */}
-          <div className="flex items-center gap-4 pt-4" style={{borderTop: "1px solid #E0E1DD"}}>
+          {/* Vote Buttons + Comment count */}
+          <div
+            className="flex items-center gap-6 pt-4"
+            style={{borderTop: "1px solid #E0E1DD"}}
+          >
+            <VoteButtons
+              postId={post.id}
+              votes={post.votes}
+              currentUserDbId={currentUserDbId}
+            />
             <div className="flex items-center gap-2">
-              <span className="text-xl">⬆️</span>
-              <span className="font-bold" style={{color: "#0B3954"}}>{voteCount} votes</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">💬</span>
-              <span className="font-bold" style={{color: "#0B3954"}}>{post.comments.length} comments</span>
+              <i className="fa-solid fa-comment" style={{color: "#7A6263"}}></i>
+              <span className="font-bold" style={{color: "#0B3954"}}>
+                {post.comments.length} comments
+              </span>
             </div>
           </div>
         </div>
 
         {/* Comments Section */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm" style={{border: "1px solid #E0E1DD"}}>
-          <h2 className="text-xl font-bold mb-6" style={{color: "#0B3954", fontFamily: "var(--font-playfair)"}}>
+        <div
+          className="bg-white rounded-2xl p-8 shadow-sm"
+          style={{border: "1px solid #E0E1DD"}}
+        >
+          <h2
+            className="text-xl font-bold mb-6"
+            style={{color: "#0B3954", fontFamily: "var(--font-playfair)"}}
+          >
             Comments ({post.comments.length})
           </h2>
 
@@ -100,7 +132,11 @@ export default async function PostPage({ params }) {
           ) : (
             <div className="flex flex-col gap-4">
               {post.comments.map((comment) => (
-                <div key={comment.id} className="p-4 rounded-xl" style={{backgroundColor: "#E0E1DD"}}>
+                <div
+                  key={comment.id}
+                  className="p-4 rounded-xl"
+                  style={{backgroundColor: "#E0E1DD"}}
+                >
                   <div className="flex items-center gap-2 mb-2">
                     <span className="font-bold text-sm" style={{color: "#0B3954"}}>
                       {comment.author.username}

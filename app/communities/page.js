@@ -31,14 +31,14 @@ export default async function CommunitiesPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {communities.map((community) => (
-                  <Link key={community.id} href={`/r/${community.slug}`}>
+                  <Link key={community.id} href={`/n/${community.slug}`}>
                     <div className="bg-white rounded-2xl p-6 border hover:shadow-md transition-all cursor-pointer" style={{borderColor: "#E0E1DD"}}>
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{backgroundColor: "#0B3954"}}>
                         <span className="text-white font-bold text-lg">
                           {community.name[0].toUpperCase()}
                         </span>
                       </div>
-                      <h3 className="font-bold text-lg" style={{color: "#0B3954"}}>r/{community.name}</h3>
+                      <h3 className="font-bold text-lg" style={{color: "#0B3954"}}>n/{community.name}</h3>
                       {community.description && (
                         <p className="text-sm mt-1 line-clamp-2" style={{color: "#7A6263"}}>{community.description}</p>
                       )}

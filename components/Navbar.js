@@ -43,7 +43,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/create-post" className="px-4 py-2 rounded-lg font-medium transition-opacity text-white" style={{backgroundColor: "#087E8B"}}>
+              <Link href="/communities" className="px-4 py-2 rounded-lg font-medium transition-opacity text-white" style={{backgroundColor: "#087E8B"}}>
                 + Post
               </Link>
               <UserButton afterSignOutUrl="/" />
