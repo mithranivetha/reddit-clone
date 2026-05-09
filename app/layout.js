@@ -1,8 +1,10 @@
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter } from "next/font/google";
+import { Playfair_Display, Lato } from "next/font/google";
+import Navbar from "@/components/Navbar";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+const lato = Lato({ weight: ["400", "700"], subsets: ["latin"], variable: "--font-lato" });
 
 export const metadata = {
   title: "Nexus",
@@ -13,8 +15,11 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>
-          {children}
+        <body className={`${playfair.variable} ${lato.variable} font-lato`}>
+          <Navbar />
+          <main className="pt-16">
+            {children}
+          </main>
         </body>
       </html>
     </ClerkProvider>
