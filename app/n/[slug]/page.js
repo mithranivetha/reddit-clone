@@ -2,14 +2,17 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export default async function CommunityPage({ params }) {
+export default async function CommunityPage({ params, searchParams }) {
   const { slug } = await params;
-  
+  const { sort } = await searchParams;
+
   const community = await prisma.community.findUnique({
     where: { slug },
     include: {
       posts: {
-        orderBy: { createdAt: "desc" },
+        orderBy: sort === "popular"
+          ? { votes: { _count: "desc" } }
+          : { createdAt: "desc" },
         include: {
           author: true,
           _count: { select: { votes: true, comments: true } },
@@ -35,7 +38,9 @@ export default async function CommunityPage({ params }) {
               </span>
             </div>
             <div>
-              <h1 className="text-3xl font-bold" style={{fontFamily: "var(--font-playfair)"}}>n/{community.name}</h1>
+              <h1 className="text-3xl font-bold" style={{fontFamily: "var(--font-playfair)"}}>
+                n/{community.name}
+              </h1>
               {community.description && (
                 <p className="opacity-90 mt-1">{community.description}</p>
               )}
@@ -45,11 +50,34 @@ export default async function CommunityPage({ params }) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Posts List */}
           <div className="lg:col-span-2">
+
+            {/* Sort Buttons */}
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold" style={{color: "#0B3954"}}>Posts</h2>
+              <div className="flex gap-2">
+                <Link
+                  href={`/n/${slug}`}
+                  className="px-4 py-2 rounded-xl font-medium text-sm transition-all"
+                  style={{
+                    backgroundColor: !sort || sort === "latest" ? "#0B3954" : "#E0E1DD",
+                    color: !sort || sort === "latest" ? "white" : "#0B3954",
+                  }}
+                >
+                  Latest
+                </Link>
+                <Link
+                  href={`/n/${slug}?sort=popular`}
+                  className="px-4 py-2 rounded-xl font-medium text-sm transition-all"
+                  style={{
+                    backgroundColor: sort === "popular" ? "#0B3954" : "#E0E1DD",
+                    color: sort === "popular" ? "white" : "#0B3954",
+                  }}
+                >
+                  Most Popular
+                </Link>
+              </div>
               <Link
                 href={`/n/${slug}/create-post`}
                 className="px-4 py-2 text-white rounded-xl font-medium hover:opacity-90 transition-opacity text-sm"
