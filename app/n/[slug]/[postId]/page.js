@@ -2,20 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import VoteButtons from "@/components/VoteButtons";
-import { auth } from "@clerk/nextjs/server";
+import CommentForm from "@/components/CommentForm";
 
 export default async function PostPage({ params }) {
   const { slug, postId } = await params;
-  const { userId } = auth();
-
-  // Get current user's database ID
-  let currentUserDbId = null;
-  if (userId) {
-    const currentUser = await prisma.user.findUnique({
-      where: { clerkId: userId },
-    });
-    currentUserDbId = currentUser?.id || null;
-  }
 
   const post = await prisma.post.findUnique({
     where: { id: postId },
@@ -101,7 +91,6 @@ export default async function PostPage({ params }) {
             <VoteButtons
               postId={post.id}
               votes={post.votes}
-              currentUserDbId={currentUserDbId}
             />
             <div className="flex items-center gap-2">
               <i className="fa-solid fa-comment" style={{color: "#7A6263"}}></i>
@@ -123,6 +112,8 @@ export default async function PostPage({ params }) {
           >
             Comments ({post.comments.length})
           </h2>
+
+          <CommentForm postId={post.id} />
 
           {post.comments.length === 0 ? (
             <div className="text-center py-8">

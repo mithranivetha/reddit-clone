@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
-export default function VoteButtons({ postId, votes, currentUserDbId }) {
+export default function VoteButtons({ postId, votes }) {
   const { isSignedIn, user } = useUser();
   const router = useRouter();
 
@@ -12,12 +12,27 @@ export default function VoteButtons({ postId, votes, currentUserDbId }) {
   const downvotes = votes.filter((v) => v.type === "DOWN").length;
   const score = upvotes - downvotes;
 
-  const currentVote = currentUserDbId
-    ? votes.find((v) => v.userId === currentUserDbId)
-    : null;
-
+  const [optimisticVote, setOptimisticVote] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [optimisticVote, setOptimisticVote] = useState(currentVote?.type || null);
+
+  // Fetch the current user's vote when page loads
+  useEffect(() => {
+    async function fetchUserVote() {
+      if (!isSignedIn || !user) return;
+
+      try {
+        const res = await fetch(`/api/votes/user?postId=${postId}&clerkId=${user.id}`);
+        const data = await res.json();
+        if (data.type) {
+          setOptimisticVote(data.type);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchUserVote();
+  }, [isSignedIn, user, postId]);
 
   async function handleVote(type) {
     if (!isSignedIn) {
@@ -25,7 +40,6 @@ export default function VoteButtons({ postId, votes, currentUserDbId }) {
       return;
     }
 
-    // Optimistic update — change color immediately
     if (optimisticVote === type) {
       setOptimisticVote(null);
     } else {
@@ -49,7 +63,6 @@ export default function VoteButtons({ postId, votes, currentUserDbId }) {
       router.refresh();
     } catch (error) {
       console.error(error);
-      setOptimisticVote(currentVote?.type || null);
     } finally {
       setLoading(false);
     }
@@ -57,7 +70,6 @@ export default function VoteButtons({ postId, votes, currentUserDbId }) {
 
   return (
     <div className="flex items-center gap-2">
-      {/* Upvote */}
       <button
         onClick={() => handleVote("UP")}
         disabled={loading}
@@ -70,12 +82,10 @@ export default function VoteButtons({ postId, votes, currentUserDbId }) {
         <i className="fa-solid fa-arrow-up"></i> {upvotes}
       </button>
 
-      {/* Score */}
       <span className="font-bold text-lg px-2" style={{color: "#0B3954"}}>
         {score}
       </span>
 
-      {/* Downvote */}
       <button
         onClick={() => handleVote("DOWN")}
         disabled={loading}
