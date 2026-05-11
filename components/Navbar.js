@@ -103,6 +103,9 @@ export default function Navbar() {
               <Link href="/communities" className="px-4 py-2 rounded-lg font-medium transition-opacity text-white" style={{backgroundColor: "#087E8B"}}>
                 + Post
               </Link>
+              <Link href="/bookmarks" className="font-medium hover:opacity-80" style={{color: "#E0E1DD"}}>
+                <i className="fa-regular fa-bookmark"></i>
+              </Link>
               <ProfileLink />
               <UserButton afterSignOutUrl="/" />
             </>

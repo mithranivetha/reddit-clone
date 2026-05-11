@@ -1,30 +1,45 @@
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function POST(req) {
   try {
-    const clerkUser = await currentUser();
+    const { clerkId, email, username } = await req.json();
 
-    if (!clerkUser) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    if (!clerkId) {
+      return NextResponse.json({ error: "No clerkId" }, { status: 400 });
     }
 
     let user = await prisma.user.findUnique({
-      where: { clerkId: clerkUser.id },
+      where: { clerkId },
     });
 
     if (!user) {
       user = await prisma.user.create({
-        data: {
-          clerkId: clerkUser.id,
-          email: clerkUser.emailAddresses[0].emailAddress,
-          username: clerkUser.username || clerkUser.emailAddresses[0].emailAddress.split("@")[0],
-        },
+        data: { clerkId, email, username },
       });
     }
 
     return NextResponse.json(user);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+  }
+}
+
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const clerkId = searchParams.get("clerkId");
+
+    if (!clerkId) {
+      return NextResponse.json({ error: "No clerkId" }, { status: 400 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { clerkId },
+    });
+
+    return NextResponse.json(user || {});
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 });

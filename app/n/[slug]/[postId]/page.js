@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import VoteButtons from "@/components/VoteButtons";
 import CommentForm from "@/components/CommentForm";
+import BookmarkButton from "@/components/BookmarkButton";
 
 export default async function PostPage({ params }) {
   const { slug, postId } = await params;
@@ -88,18 +89,16 @@ export default async function PostPage({ params }) {
             className="flex items-center gap-6 pt-4"
             style={{borderTop: "1px solid #E0E1DD"}}
           >
-            <VoteButtons
-              postId={post.id}
-              votes={post.votes}
-            />
+            <VoteButtons postId={post.id} />
             <div className="flex items-center gap-2">
               <i className="fa-solid fa-comment" style={{color: "#7A6263"}}></i>
               <span className="font-bold" style={{color: "#0B3954"}}>
                 {post.comments.length} comments
               </span>
             </div>
+            <BookmarkButton postId={post.id} />
           </div>
-        </div>
+        </div>  
 
         {/* Comments Section */}
         <div
