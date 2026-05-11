@@ -1,9 +1,38 @@
 "use client";
 
-import { useAuth, UserButton } from "@clerk/nextjs";
+import { useAuth, UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+
+function ProfileLink() {
+  const { user, isSignedIn } = useUser();
+  const [profileUsername, setProfileUsername] = useState(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      if (!isSignedIn || !user) return;
+      try {
+        const res = await fetch(`/api/profile/me?clerkId=${user.id}`);
+        const data = await res.json();
+        if (data.username) {
+          setProfileUsername(data.username);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchProfile();
+  }, [isSignedIn, user]);
+
+  const href = profileUsername ? `/profile/${profileUsername}` : "/profile-setup";
+
+  return (
+    <Link href={href} className="font-medium hover:opacity-80" style={{color: "#E0E1DD"}}>
+      Profile
+    </Link>
+  );
+}
 
 export default function Navbar() {
   const { isSignedIn } = useAuth();
@@ -74,6 +103,7 @@ export default function Navbar() {
               <Link href="/communities" className="px-4 py-2 rounded-lg font-medium transition-opacity text-white" style={{backgroundColor: "#087E8B"}}>
                 + Post
               </Link>
+              <ProfileLink />
               <UserButton afterSignOutUrl="/" />
             </>
           )}
