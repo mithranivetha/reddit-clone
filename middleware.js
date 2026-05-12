@@ -16,6 +16,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/comments(.*)",
   "/api/posts(.*)",
   "/api/communities(.*)",
+  "/api/delete(.*)"
 ]);
 
 export default clerkMiddleware(async (auth, request) => {

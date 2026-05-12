@@ -61,7 +61,7 @@ export default function BookmarkButton({ postId }) {
       disabled={loading}
       className="flex items-center gap-2 px-3 py-2 rounded-xl font-medium text-sm transition-all disabled:opacity-50"
       style={{
-        backgroundColor: isBookmarked ? "#7A6263" : "#E0E1DD",
+        backgroundColor: isBookmarked ? "#087E8B" : "#E0E1DD",
         color: isBookmarked ? "white" : "#0B3954",
       }}
     >

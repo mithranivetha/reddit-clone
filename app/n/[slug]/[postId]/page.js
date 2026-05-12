@@ -4,6 +4,8 @@ import Link from "next/link";
 import VoteButtons from "@/components/VoteButtons";
 import CommentForm from "@/components/CommentForm";
 import BookmarkButton from "@/components/BookmarkButton";
+import DeletePostButton from "@/components/DeletePostButton";
+import DeleteCommentButton from "@/components/DeleteCommentButton";
 
 export default async function PostPage({ params }) {
   const { slug, postId } = await params;
@@ -86,7 +88,7 @@ export default async function PostPage({ params }) {
 
           {/* Vote Buttons + Comment count */}
           <div
-            className="flex items-center gap-6 pt-4"
+            className="flex items-center gap-6 pt-4 flex-wrap"
             style={{borderTop: "1px solid #E0E1DD"}}
           >
             <VoteButtons postId={post.id} />
@@ -97,6 +99,11 @@ export default async function PostPage({ params }) {
               </span>
             </div>
             <BookmarkButton postId={post.id} />
+            <DeletePostButton
+              postId={post.id}
+              authorClerkId={post.author.clerkId}
+              communitySlug={slug}
+            />
           </div>
         </div>  
 
@@ -127,13 +134,19 @@ export default async function PostPage({ params }) {
                   className="p-4 rounded-xl"
                   style={{backgroundColor: "#E0E1DD"}}
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-bold text-sm" style={{color: "#0B3954"}}>
-                      {comment.author.username}
-                    </span>
-                    <span className="text-xs" style={{color: "#7A6263"}}>
-                      {new Date(comment.createdAt).toLocaleDateString()}
-                    </span>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm" style={{color: "#0B3954"}}>
+                        {comment.author.username}
+                      </span>
+                      <span className="text-xs" style={{color: "#7A6263"}}>
+                        {new Date(comment.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <DeleteCommentButton
+                      commentId={comment.id}
+                      authorClerkId={comment.author.clerkId}
+                    />
                   </div>
                   <p style={{color: "#7A6263"}}>{comment.content}</p>
                 </div>
@@ -141,7 +154,6 @@ export default async function PostPage({ params }) {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

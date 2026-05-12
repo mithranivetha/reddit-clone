@@ -64,7 +64,7 @@ export default function CreatePostForm({ communityId, slug }) {
       if (!res.ok) {
         setError(data.error || "Something went wrong");
       } else {
-        router.push(`/r/${slug}/${data.id}`);
+        router.push(`/n/${slug}/${data.id}`);
         router.refresh();
       }
     } catch (err) {
