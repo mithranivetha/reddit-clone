@@ -45,7 +45,7 @@ export default function CreateCommunityForm() {
       if (!res.ok) {
         setError(data.error || "Something went wrong");
       } else {
-        router.push(`/r/${data.slug}`);
+        router.push(`/n/${data.slug}`);
         router.refresh();
       }
     } catch (err) {

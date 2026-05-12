@@ -16,7 +16,6 @@ export default function UserSync() {
           body: JSON.stringify({
             clerkId: user.id,
             email: user.primaryEmailAddress.emailAddress,
-            username: user.username || user.primaryEmailAddress.emailAddress.split("@")[0],
           }),
         });
       } catch (error) {

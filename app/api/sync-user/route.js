@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
-    const { clerkId, email, username } = await req.json();
+    const { clerkId, email } = await req.json();
 
     if (!clerkId) {
       return NextResponse.json({ error: "No clerkId" }, { status: 400 });
@@ -14,8 +14,13 @@ export async function POST(req) {
     });
 
     if (!user) {
+      // Create user WITHOUT username so they get redirected to profile setup
       user = await prisma.user.create({
-        data: { clerkId, email, username },
+        data: {
+          clerkId,
+          email,
+          username: `user_${clerkId.slice(-8)}`, // temporary unique username
+        },
       });
     }
 

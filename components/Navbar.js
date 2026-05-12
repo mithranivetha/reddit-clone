@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 function ProfileLink() {
   const { user, isSignedIn } = useUser();
   const [profileUsername, setProfileUsername] = useState(null);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -15,15 +16,18 @@ function ProfileLink() {
       try {
         const res = await fetch(`/api/profile/me?clerkId=${user.id}`);
         const data = await res.json();
-        if (data.username) {
-          setProfileUsername(data.username);
-        }
+        setProfileUsername(data.username || null);
       } catch (error) {
         console.error(error);
+      } finally {
+        setChecked(true);
       }
     }
     fetchProfile();
   }, [isSignedIn, user]);
+
+  // Don't render until we've checked
+  if (!checked) return null;
 
   const href = profileUsername ? `/profile/${profileUsername}` : "/profile-setup";
 
