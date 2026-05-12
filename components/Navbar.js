@@ -28,7 +28,7 @@ function ProfileLink() {
   const href = profileUsername ? `/profile/${profileUsername}` : "/profile-setup";
 
   return (
-    <Link href={href} className="font-medium hover:opacity-80" style={{color: "#E0E1DD"}}>
+    <Link href={href} className="font-medium hover:opacity-80 transition-opacity text-sm" style={{color: "#E0E1DD"}}>
       Profile
     </Link>
   );
@@ -38,6 +38,15 @@ export default function Navbar() {
   const { isSignedIn } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 10);
+    }
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   function handleSearch(e) {
     e.preventDefault();
@@ -48,22 +57,28 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 shadow-sm" style={{backgroundColor: "#0B3954"}}>
+    <nav
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      style={{
+        backgroundColor: "#0B3954",
+        boxShadow: scrolled ? "0 2px 20px rgba(0,0,0,0.3)" : "none",
+      }}
+    >
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-        
+
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{backgroundColor: "#087E8B"}}>
             <span className="text-white font-bold text-sm">N</span>
           </div>
-          <span className="text-xl font-bold" style={{color: "#E0E1DD", fontFamily: "var(--font-playfair)"}}>
+          <span className="text-xl font-bold hidden sm:block" style={{color: "#E0E1DD", fontFamily: "var(--font-playfair)"}}>
             Nexus
           </span>
         </Link>
 
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="flex-1 max-w-md">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl" style={{backgroundColor: "rgba(255,255,255,0.1)"}}>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all" style={{backgroundColor: "rgba(255,255,255,0.1)"}}>
             <i className="fa-solid fa-magnifying-glass text-sm" style={{color: "#E0E1DD"}}></i>
             <input
               type="text"
@@ -79,10 +94,10 @@ export default function Navbar() {
 
         {/* Middle Links */}
         <div className="hidden md:flex items-center gap-6 shrink-0">
-          <Link href="/" className="font-medium transition-colors hover:opacity-80" style={{color: "#E0E1DD"}}>
+          <Link href="/" className="font-medium transition-opacity hover:opacity-80 text-sm" style={{color: "#E0E1DD"}}>
             Home
           </Link>
-          <Link href="/communities" className="font-medium transition-colors hover:opacity-80" style={{color: "#E0E1DD"}}>
+          <Link href="/communities" className="font-medium transition-opacity hover:opacity-80 text-sm" style={{color: "#E0E1DD"}}>
             Communities
           </Link>
         </div>
@@ -91,19 +106,27 @@ export default function Navbar() {
         <div className="flex items-center gap-3 shrink-0">
           {!isSignedIn ? (
             <>
-              <Link href="/sign-in" className="px-4 py-2 rounded-lg font-medium transition-colors border" style={{color: "#E0E1DD", borderColor: "#E0E1DD"}}>
+              <Link href="/sign-in" className="px-4 py-2 rounded-lg font-medium transition-all border text-sm hidden sm:block" style={{color: "#E0E1DD", borderColor: "#E0E1DD"}}>
                 Sign In
               </Link>
-              <Link href="/sign-up" className="px-4 py-2 rounded-lg font-medium transition-opacity text-white" style={{backgroundColor: "#087E8B"}}>
+              <Link href="/sign-up" className="px-4 py-2 rounded-lg font-medium transition-opacity text-white text-sm" style={{backgroundColor: "#087E8B"}}>
                 Sign Up
               </Link>
             </>
           ) : (
             <>
-              <Link href="/communities" className="px-4 py-2 rounded-lg font-medium transition-opacity text-white" style={{backgroundColor: "#087E8B"}}>
+              <Link
+                href="/communities"
+                className="px-4 py-2 rounded-lg font-medium transition-opacity text-white text-sm"
+                style={{backgroundColor: "#087E8B"}}
+              >
                 + Post
               </Link>
-              <Link href="/bookmarks" className="font-medium hover:opacity-80" style={{color: "#E0E1DD"}}>
+              <Link
+                href="/bookmarks"
+                className="font-medium hover:opacity-80 transition-opacity"
+                style={{color: "#E0E1DD"}}
+              >
                 <i className="fa-regular fa-bookmark"></i>
               </Link>
               <ProfileLink />
