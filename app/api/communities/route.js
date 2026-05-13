@@ -31,13 +31,22 @@ export async function POST(req) {
     });
 
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          clerkId,
-          email,
-          username,
-        },
-      });
+        // Check if email already exists
+        const existingByEmail = await prisma.user.findUnique({
+            where: { email },
+        });
+  
+        if (existingByEmail) {
+            // Update clerkId if email exists
+            user = await prisma.user.update({
+                where: { email },
+                data: { clerkId },
+            });
+        } else {
+            user = await prisma.user.create({
+                data: { clerkId, email, username },
+            });
+        }
     }
 
     const community = await prisma.community.create({
