@@ -9,27 +9,32 @@ export default async function Home({ searchParams }) {
 
   let posts = [];
 
-  if (activeTab === "trending") {
-    posts = await prisma.post.findMany({
-      orderBy: { votes: { _count: "desc" } },
-      take: 6,
-      include: {
-        author: true,
-        community: true,
-        _count: { select: { votes: true, comments: true } },
-      },
-    });
-  } else {
-    posts = await prisma.post.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 6,
-      include: {
-        author: true,
-        community: true,
-        _count: { select: { votes: true, comments: true } },
-      },
-    });
-  }
+  try {
+if (activeTab === "trending") {
+  posts = await prisma.post.findMany({
+    orderBy: { votes: { _count: "desc" } },
+    take: 6,
+    include: {
+      author: true,
+      community: true,
+      _count: { select: { votes: true, comments: true } },
+    },
+  });
+} else {
+  posts = await prisma.post.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 6,
+    include: {
+      author: true,
+      community: true,
+      _count: { select: { votes: true, comments: true } },
+    },
+  });
+}
+} catch (error) {
+  console.error("Database error:", error);
+  posts = [];
+}
 
   return (
     <div className="min-h-screen" style={{backgroundColor: "#E0E1DD"}}>
