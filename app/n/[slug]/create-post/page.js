@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import CreatePostForm from "@/components/CreatePostForm";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";

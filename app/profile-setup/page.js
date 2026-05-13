@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import ProfileSetupForm from "@/components/ProfileSetupForm";
 
 export default function ProfileSetupPage() {
