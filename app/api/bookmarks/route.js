@@ -8,9 +8,10 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const postId = searchParams.get("postId");
     const clerkId = searchParams.get("clerkId");
+    const all = searchParams.get("all");
 
-    if (!postId || !clerkId) {
-      return NextResponse.json({ isBookmarked: false });
+    if (!clerkId) {
+      return NextResponse.json(all ? [] : { isBookmarked: false });
     }
 
     const user = await prisma.user.findUnique({
@@ -18,9 +19,28 @@ export async function GET(req) {
     });
 
     if (!user) {
-      return NextResponse.json({ isBookmarked: false });
+      return NextResponse.json(all ? [] : { isBookmarked: false });
     }
 
+    // Return all bookmarks
+    if (all === "true") {
+      const bookmarks = await prisma.bookmark.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+        include: {
+          post: {
+            include: {
+              author: true,
+              community: true,
+              _count: { select: { votes: true, comments: true } },
+            },
+          },
+        },
+      });
+      return NextResponse.json(bookmarks);
+    }
+
+    // Check single bookmark
     const bookmark = await prisma.bookmark.findFirst({
       where: { postId, userId: user.id },
     });
@@ -40,7 +60,6 @@ export async function POST(req) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Get or create user
     let user = await prisma.user.findUnique({
       where: { clerkId },
     });
@@ -51,19 +70,16 @@ export async function POST(req) {
       });
     }
 
-    // Check if already bookmarked
     const existing = await prisma.bookmark.findFirst({
       where: { postId, userId: user.id },
     });
 
     if (existing) {
-      // Remove bookmark
       await prisma.bookmark.delete({
         where: { id: existing.id },
       });
       return NextResponse.json({ isBookmarked: false });
     } else {
-      // Add bookmark
       await prisma.bookmark.create({
         data: { postId, userId: user.id },
       });

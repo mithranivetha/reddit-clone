@@ -12,7 +12,7 @@ export default function BookmarksPage() {
     async function fetchBookmarks() {
       if (!isSignedIn || !user) return;
       try {
-        const res = await fetch(`/api/bookmarks/all?clerkId=${user.id}`);
+        const res = await fetch(`/api/bookmarks?clerkId=${user.id}&all=true`);
         const data = await res.json();
         setBookmarks(data);
       } catch (error) {
